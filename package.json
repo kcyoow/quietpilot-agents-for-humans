@@ -1,0 +1,45 @@
+{
+  "name": "quietpilot",
+  "version": "0.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13 <23"
+  },
+  "workspaces": [
+    "apps/mobile",
+    "infra"
+  ],
+  "scripts": {
+    "validate": "node scripts/validate-workspace.mjs",
+    "generate:contracts": "node scripts/generate-contracts.mjs",
+    "check:contracts": "node scripts/generate-contracts.mjs --check",
+    "typecheck:contracts": "tsc -p tsconfig.contracts.json --noEmit",
+    "infra:format": "npm run format:check -w quietpilot-infra",
+    "infra:typecheck": "npm run typecheck -w quietpilot-infra",
+    "infra:test": "npm test -w quietpilot-infra",
+    "infra:synth": "npm run synth -w quietpilot-infra",
+    "infra:verify": "npm run infra:format && npm run infra:typecheck && npm run infra:test && npm run infra:synth",
+    "mobile:lint": "npm run lint -w mobile",
+    "mobile:format": "npm run format:check -w mobile",
+    "mobile:typecheck": "npm run typecheck -w mobile",
+    "mobile:test": "npm run test -w mobile",
+    "mobile:doctor": "npm run doctor -w mobile",
+    "mobile:verify": "npm run mobile:format && npm run mobile:lint && npm run mobile:typecheck && npm run mobile:test && npm run mobile:doctor",
+    "test:python": "uv run --all-packages --with \"moto[dynamodb,sqs]>=5,<6\" pytest",
+    "test": "npm run validate && npm run check:contracts && npm run typecheck:contracts && npm run test:python && npm run infra:typecheck && npm run infra:test && npm run mobile:test",
+    "build:preview:android": "python3 scripts/build_preview.py"
+  },
+  "devDependencies": {
+    "@expo/metro-runtime": "57.0.15",
+    "@types/node": "^26.2.0",
+    "expo": "57.0.22",
+    "expo-router": "57.0.21",
+    "json-schema-to-typescript": "^15.0.4",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "5.9.3"
+  },
+  "overrides": {
+    "react-native": "0.86.3"
+  },
+  "packageManager": "npm@10.9.8"
+}

@@ -1,0 +1,166 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ManageNamedQuietPilotStacks",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:CreateChangeSet",
+        "cloudformation:CreateStack",
+        "cloudformation:DeleteChangeSet",
+        "cloudformation:DescribeChangeSet",
+        "cloudformation:DescribeStackEvents",
+        "cloudformation:DescribeStackResources",
+        "cloudformation:DescribeStacks",
+        "cloudformation:ExecuteChangeSet",
+        "cloudformation:GetTemplate",
+        "cloudformation:ListStackResources",
+        "cloudformation:UpdateStack",
+        "cloudformation:UpdateTerminationProtection"
+      ],
+      "Resource": [
+        "arn:aws:cloudformation:ap-northeast-2:424792720291:stack/QuietPilotAuth/*",
+        "arn:aws:cloudformation:ap-northeast-2:424792720291:stack/QuietPilotData/*",
+        "arn:aws:cloudformation:ap-northeast-2:424792720291:stack/QuietPilotApi/*",
+        "arn:aws:cloudformation:ap-northeast-2:424792720291:stack/QuietPilotSchedule/*",
+        "arn:aws:cloudformation:ap-northeast-2:424792720291:stack/QuietPilotObservability/*",
+        "arn:aws:cloudformation:ap-northeast-2:424792720291:stack/AgentCore-QuietPilot-dev/*"
+      ]
+    },
+    {
+      "Sid": "ReadBootstrapStack",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:DescribeStackEvents",
+        "cloudformation:DescribeStackResources",
+        "cloudformation:DescribeStacks",
+        "cloudformation:GetTemplate",
+        "cloudformation:ListStackResources"
+      ],
+      "Resource": "arn:aws:cloudformation:ap-northeast-2:424792720291:stack/CDKToolkit/*"
+    },
+    {
+      "Sid": "ReadGooglePubSubProofLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:DescribeLogStreams",
+        "logs:FilterLogEvents",
+        "logs:GetLogEvents"
+      ],
+      "Resource": [
+        "arn:aws:logs:ap-northeast-2:424792720291:log-group:QuietPilotApi-HttpApiAccessLogs4B419BF6-0p5c2DdxV7qB",
+        "arn:aws:logs:ap-northeast-2:424792720291:log-group:QuietPilotApi-HttpApiAccessLogs4B419BF6-0p5c2DdxV7qB:*",
+        "arn:aws:logs:ap-northeast-2:424792720291:log-group:QuietPilotApi-IngressFunctionLogs5BAD6FCE-yzvDifwzrB7T",
+        "arn:aws:logs:ap-northeast-2:424792720291:log-group:QuietPilotApi-IngressFunctionLogs5BAD6FCE-yzvDifwzrB7T:*"
+      ]
+    },
+    {
+      "Sid": "ValidateCloudFormationTemplates",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:GetTemplateSummary",
+        "cloudformation:ListExports",
+        "cloudformation:ListImports",
+        "cloudformation:ValidateTemplate"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-northeast-2"
+        }
+      }
+    },
+    {
+      "Sid": "UseQuietPilotBootstrapRoles",
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Resource": [
+        "arn:aws:iam::424792720291:role/cdk-hnb659fds-deploy-role-424792720291-ap-northeast-2",
+        "arn:aws:iam::424792720291:role/cdk-hnb659fds-file-publishing-role-424792720291-ap-northeast-2"
+      ]
+    },
+    {
+      "Sid": "ReadCdkBootstrapVersion",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameter",
+        "ssm:GetParameters"
+      ],
+      "Resource": "arn:aws:ssm:ap-northeast-2:424792720291:parameter/cdk-bootstrap/hnb659fds/version"
+    },
+    {
+      "Sid": "ListQuietPilotAgentCoreRuntimes",
+      "Effect": "Allow",
+      "Action": "bedrock-agentcore:ListAgentRuntimes",
+      "Resource": "*"
+    },
+    {
+      "Sid": "ReadQuietPilotAgentCoreRuntime",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock-agentcore:GetAgentRuntime",
+        "bedrock-agentcore:ListAgentRuntimeEndpoints",
+        "bedrock-agentcore:ListAgentRuntimeVersions"
+      ],
+      "Resource": "arn:aws:bedrock-agentcore:ap-northeast-2:424792720291:runtime/QuietPilot_QuietPilotAgent-lfJcf5Ev29"
+    },
+    {
+      "Sid": "ReadQuietPilotGoogleOauthProvider",
+      "Effect": "Allow",
+      "Action": "bedrock-agentcore:GetOauth2CredentialProvider",
+      "Resource": [
+        "arn:aws:bedrock-agentcore:ap-northeast-2:424792720291:token-vault/default",
+        "arn:aws:bedrock-agentcore:ap-northeast-2:424792720291:token-vault/default/oauth2credentialprovider/quietpilot-google"
+      ]
+    },
+    {
+      "Sid": "ListQuietPilotOauthProviders",
+      "Effect": "Allow",
+      "Action": "bedrock-agentcore:ListOauth2CredentialProviders",
+      "Resource": "*"
+    },
+    {
+      "Sid": "ReadAndBindQuietPilotWorkloadIdentity",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock-agentcore:GetWorkloadIdentity",
+        "bedrock-agentcore:UpdateWorkloadIdentity"
+      ],
+      "Resource": [
+        "arn:aws:bedrock-agentcore:ap-northeast-2:424792720291:workload-identity-directory/default",
+        "arn:aws:bedrock-agentcore:ap-northeast-2:424792720291:workload-identity-directory/default/workload-identity/QuietPilot_QuietPilotAgent-lfJcf5Ev29"
+      ]
+    },
+    {
+      "Sid": "CreateCognitoUserPoolInSeoul",
+      "Effect": "Allow",
+      "Action": "cognito-idp:CreateUserPool",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-northeast-2"
+        }
+      }
+    },
+    {
+      "Sid": "ManageQuietPilotCognitoResources",
+      "Effect": "Allow",
+      "Action": [
+        "cognito-idp:CreateUserPoolClient",
+        "cognito-idp:DescribeUserPool",
+        "cognito-idp:DescribeUserPoolClient",
+        "cognito-idp:ListTagsForResource",
+        "cognito-idp:TagResource",
+        "cognito-idp:UntagResource",
+        "cognito-idp:UpdateUserPool",
+        "cognito-idp:UpdateUserPoolClient"
+      ],
+      "Resource": "arn:aws:cognito-idp:ap-northeast-2:424792720291:userpool/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-northeast-2"
+        }
+      }
+    }
+  ]
+}

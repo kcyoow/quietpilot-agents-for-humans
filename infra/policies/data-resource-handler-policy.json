@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadQuietPilotDynamoDbHandlerState",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:DescribeContributorInsights",
+        "dynamodb:DescribeKinesisStreamingDestination",
+        "dynamodb:DescribeTimeToLive",
+        "dynamodb:GetResourcePolicy"
+      ],
+      "Resource": "arn:aws:dynamodb:ap-northeast-2:424792720291:table/QuietPilot*"
+    },
+    {
+      "Sid": "ConfigureQuietPilotDynamoDbTimeToLive",
+      "Effect": "Allow",
+      "Action": "dynamodb:UpdateTimeToLive",
+      "Resource": "arn:aws:dynamodb:ap-northeast-2:424792720291:table/QuietPilot*"
+    }
+  ]
+}

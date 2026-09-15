@@ -1,0 +1,16 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "TrustOnlyQuietPilotDeploymentRole",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::424792720291:role/QuietPilotDeploymentRole"
+      },
+      "Action": [
+        "sts:AssumeRole",
+        "sts:TagSession"
+      ]
+    }
+  ]
+}

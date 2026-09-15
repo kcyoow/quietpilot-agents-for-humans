@@ -1,0 +1,129 @@
+{
+  "$defs": {
+    "ActionProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "connector": {
+          "minLength": 1,
+          "title": "Connector",
+          "type": "string"
+        },
+        "parameters": {
+          "additionalProperties": true,
+          "title": "Parameters",
+          "type": "object"
+        },
+        "required_scopes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Scopes",
+          "type": "array"
+        },
+        "reversible": {
+          "title": "Reversible",
+          "type": "boolean"
+        },
+        "risk": {
+          "$ref": "#/$defs/Risk"
+        },
+        "target_resource": {
+          "minLength": 1,
+          "title": "Target Resource",
+          "type": "string"
+        },
+        "verb": {
+          "minLength": 1,
+          "title": "Verb",
+          "type": "string"
+        },
+        "verification_method": {
+          "minLength": 1,
+          "title": "Verification Method",
+          "type": "string"
+        }
+      },
+      "required": [
+        "connector",
+        "target_resource",
+        "verb",
+        "parameters",
+        "risk",
+        "reversible",
+        "verification_method"
+      ],
+      "title": "ActionProposal",
+      "type": "object"
+    },
+    "CaseType": {
+      "enum": [
+        "CONNECTED_SIGNAL",
+        "DIRECT_DELEGATION",
+        "ROUTINE_DISCOVERY",
+        "EXCEPTION_APPROVAL"
+      ],
+      "title": "CaseType",
+      "type": "string"
+    },
+    "Risk": {
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "title": "Risk",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actions": {
+      "items": {
+        "$ref": "#/$defs/ActionProposal"
+      },
+      "title": "Actions",
+      "type": "array"
+    },
+    "case_type": {
+      "$ref": "#/$defs/CaseType"
+    },
+    "decision_question": {
+      "minLength": 1,
+      "title": "Decision Question",
+      "type": "string"
+    },
+    "evidence_revisions": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Evidence Revisions",
+      "type": "object"
+    },
+    "explanation": {
+      "minLength": 1,
+      "title": "Explanation",
+      "type": "string"
+    },
+    "goal": {
+      "minLength": 1,
+      "title": "Goal",
+      "type": "string"
+    },
+    "preparation_steps": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Preparation Steps",
+      "type": "array"
+    }
+  },
+  "required": [
+    "case_type",
+    "goal",
+    "explanation",
+    "evidence_revisions",
+    "decision_question"
+  ],
+  "title": "CasePlanProposal",
+  "type": "object"
+}

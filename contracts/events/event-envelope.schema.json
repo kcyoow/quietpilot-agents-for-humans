@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quietpilot.local/schemas/event-envelope.json",
+  "title": "QuietPilotEventEnvelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "event_type",
+    "user_id",
+    "connector",
+    "occurred_at",
+    "dedupe_key",
+    "trace_id",
+    "payload"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "event_id": {"type": "string", "minLength": 1},
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "INITIAL_SCAN_REQUESTED",
+        "INITIAL_SCAN_CONTINUATION",
+        "GMAIL_HISTORY_AVAILABLE",
+        "MAIL_SETUP_REQUESTED",
+        "MAIL_RECOMMENDATIONS_REQUESTED",
+        "MAIL_SCAN_REQUESTED",
+        "MAIL_SCAN_CONTINUATION",
+        "DIRECT_REQUEST_RECEIVED",
+        "CAPABILITY_SCAN_REQUESTED",
+        "PLAN_APPROVED",
+        "ACTION_EXECUTE_REQUESTED",
+        "ACTION_VERIFY_REQUESTED",
+        "NOTIFICATION_DISPATCH_REQUESTED",
+        "GOOGLE_CONNECTION_REVOKED",
+        "SMARTTHINGS_DEVICE_EVENT",
+        "SMARTTHINGS_CONNECTION_DELETED"
+      ]
+    },
+    "user_id": {"type": "string", "minLength": 1},
+    "connector": {"type": "string", "enum": ["google", "smartthings", "direct", "system"]},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "dedupe_key": {"type": "string", "minLength": 1},
+    "trace_id": {"type": "string", "minLength": 1},
+    "payload": {"type": "object"}
+  },
+  "allOf": [{
+    "if": {"properties": {"event_type": {"const": "NOTIFICATION_DISPATCH_REQUESTED"}}},
+    "then": {"properties": {
+      "connector": {"const": "system"},
+      "payload": {
+        "type": "object", "additionalProperties": false,
+        "required": ["notification_id"],
+        "properties": {"notification_id": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+      }
+    }}
+  }]
+}

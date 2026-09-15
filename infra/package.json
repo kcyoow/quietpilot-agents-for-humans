@@ -1,0 +1,23 @@
+{
+  "name": "quietpilot-infra",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write \"{bin,lib,test}/**/*.ts\" \"*.{json,md}\"",
+    "format:check": "prettier --check \"{bin,lib,test}/**/*.ts\" \"*.{json,md}\"",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/**/*.test.ts",
+    "synth": "cdk synth --no-lookups --path-metadata false --asset-metadata false --version-reporting false"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.266.0",
+    "constructs": "10.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "26.0.0",
+    "aws-cdk": "2.1138.0",
+    "prettier": "3.6.2",
+    "tsx": "4.23.12",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ListRegionalApplicationResourcesForCloudFormationHandlers",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:ListFunctions",
+        "logs:CreateLogDelivery",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy",
+        "logs:UpdateLogDelivery",
+        "sqs:ListQueues",
+        "scheduler:ListSchedules"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-northeast-2"
+        }
+      }
+    },
+    {
+      "Sid": "ListApplicationRolesForCloudFormationHandler",
+      "Effect": "Allow",
+      "Action": "iam:ListRoles",
+      "Resource": "*"
+    },
+    {
+      "Sid": "ReadQuietPilotLambdaHandlerState",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:GetFunctionCodeSigningConfig",
+        "lambda:GetFunctionRecursionConfig",
+        "lambda:GetFunctionScalingConfig"
+      ],
+      "Resource": "arn:aws:lambda:ap-northeast-2:424792720291:function:QuietPilotApi-*"
+    },
+    {
+      "Sid": "ReadQuietPilotLogGroupHandlerState",
+      "Effect": "Allow",
+      "Action": [
+        "logs:DescribeIndexPolicies",
+        "logs:GetDataProtectionPolicy"
+      ],
+      "Resource": "arn:aws:logs:ap-northeast-2:424792720291:log-group:QuietPilotApi-*"
+    },
+    {
+      "Sid": "ManageQuietPilotHttpApiStageTags",
+      "Effect": "Allow",
+      "Action": [
+        "apigateway:TagResource",
+        "apigateway:UntagResource"
+      ],
+      "Resource": "arn:aws:apigateway:ap-northeast-2::/apis/*/stages*"
+    }
+  ]
+}

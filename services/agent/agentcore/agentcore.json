@@ -1,0 +1,45 @@
+{
+  "$schema": "https://schema.agentcore.aws.dev/v1/agentcore.json",
+  "name": "QuietPilot",
+  "version": 1,
+  "managedBy": "CDK",
+  "runtimes": [
+    {
+      "name": "QuietPilotAgent",
+      "description": "Proposal-only typed Strands runtime for QuietPilot",
+      "build": "CodeZip",
+      "entrypoint": "main.py",
+      "codeLocation": ".",
+      "runtimeVersion": "PYTHON_3_12",
+      "envVars": [
+        {
+          "name": "QUIETPILOT_BEDROCK_MODEL_ID",
+          "value": "global.amazon.nova-2-lite-v1:0"
+        },
+        {
+          "name": "QUIETPILOT_BEDROCK_REGION",
+          "value": "ap-northeast-2"
+        },
+        {
+          "name": "QUIETPILOT_GMAIL_TOPIC_NAME",
+          "value": "projects/quietpilot-kcyoow-2026/topics/quietpilot-gmail"
+        },
+        {
+          "name": "QUIETPILOT_GOOGLE_OAUTH_RETURN_URL",
+          "value": "https://cyqygmac77.execute-api.ap-northeast-2.amazonaws.com/oauth/google/callback"
+        },
+        {
+          "name": "OTEL_SEMCONV_STABILITY_OPT_IN",
+          "value": "gen_ai_unredacted_attributes="
+        },
+        {
+          "name": "DISABLE_ADOT_OBSERVABILITY",
+          "value": "true"
+        }
+      ],
+      "networkMode": "PUBLIC",
+      "protocol": "HTTP",
+      "authorizerType": "AWS_IAM"
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1180" viewBox="0 0 1800 1180" role="img" aria-labelledby="title desc">
+  <title id="title">QuietPilot: mail to an approved and verified Calendar result</title>
+  <desc id="desc">Gmail signals enter a queue and worker. Strands agents on AgentCore prepare a source-bound Case. The Android user explicitly approves the saved plan through Cognito and the control API. The worker executes and reads back the Calendar event before saving a verified result. Prepare-only routines never grant recurring write authority. Generic attention notifications use Expo and FCM.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#23766a"/></marker>
+    <marker id="amberArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b27120"/></marker>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; }
+      .ink { fill: #15333f; }
+      .muted { fill: #526872; }
+      .white { fill: #fff; }
+      .label { font-size: 17px; font-weight: 700; letter-spacing: 1.7px; }
+      .heading { font-size: 27px; font-weight: 700; }
+      .body { font-size: 21px; }
+      .small { font-size: 18px; }
+      .card { fill: #fff; stroke: #d9e2df; stroke-width: 2; }
+      .flow { fill: none; stroke: #23766a; stroke-width: 3.2; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1800" height="1180" fill="#f5f6f2"/>
+  <rect x="64" y="47" width="12" height="57" rx="6" fill="#23766a"/>
+  <text x="95" y="86" class="ink" font-size="49" font-weight="700">QuietPilot</text>
+  <text x="64" y="132" class="muted" font-size="26">From an inbox signal to an approved, verified Calendar result</text>
+  <rect x="1310" y="54" width="426" height="39" rx="19.5" fill="#e2eee7"/>
+  <text x="1523" y="79" fill="#23766a" font-size="15" font-weight="700" text-anchor="middle" letter-spacing="1.2">EVERYDAY AGENTS · IMPLEMENTED PATH</text>
+  <line x1="64" y1="168" x2="1736" y2="168" stroke="#d9e2df" stroke-width="2"/>
+
+  <text x="64" y="207" class="label muted">01 / UNDERSTAND AND PREPARE</text>
+
+  <rect x="64" y="234" width="240" height="206" rx="20" class="card"/>
+  <circle cx="101" cy="274" r="15" fill="#e2eee7"/>
+  <path d="M92 269h18v11H92z M92 269l9 6 9-6" fill="none" stroke="#23766a" stroke-width="1.8"/>
+  <text x="89" y="325" class="heading ink">Gmail</text>
+  <text x="89" y="363" class="body muted">Authorized mail</text>
+  <text x="89" y="394" class="body muted">Read-only source</text>
+
+  <path d="M309 337 H347" class="flow"/>
+  <rect x="356" y="234" width="298" height="206" rx="20" class="card"/>
+  <text x="381" y="281" class="heading ink">Ingestion</text>
+  <text x="381" y="322" class="body muted">Pub/Sub or manual scan</text>
+  <text x="381" y="355" class="body muted">SQS + Worker Lambda</text>
+  <text x="381" y="388" class="small muted">Watch renewal / recovery</text>
+  <text x="381" y="418" fill="#23766a" font-size="15" font-weight="700">Reference jobs · no OAuth tokens</text>
+
+  <path d="M659 337 H697" class="flow"/>
+  <rect x="706" y="234" width="630" height="206" rx="20" fill="#153b45"/>
+  <text x="734" y="279" class="white" font-size="28" font-weight="700">Strands Agents SDK on AgentCore</text>
+  <rect x="734" y="299" width="121" height="31" rx="15" fill="#2e5960"/>
+  <text x="794" y="320" class="white" font-size="16" text-anchor="middle">Assess mail</text>
+  <rect x="865" y="299" width="153" height="31" rx="15" fill="#2e5960"/>
+  <text x="941" y="320" class="white" font-size="16" text-anchor="middle">Prepare a draft</text>
+  <rect x="1028" y="299" width="203" height="31" rx="15" fill="#2e5960"/>
+  <text x="1129" y="320" class="white" font-size="16" text-anchor="middle">Independent verifier</text>
+  <text x="734" y="364" fill="#d8eae5" class="body">Source + capability checks · bounded typed tools</text>
+  <text x="734" y="395" fill="#d8eae5" class="small">Amazon Nova 2 Lite via Amazon Bedrock</text>
+  <text x="734" y="422" fill="#b8d6cf" font-size="17">AgentCore Identity supplies delegated Google credentials</text>
+
+  <path d="M1341 337 H1379" class="flow"/>
+  <rect x="1388" y="234" width="348" height="206" rx="20" class="card"/>
+  <text x="1413" y="282" class="heading ink">Source-bound Case</text>
+  <text x="1413" y="324" class="body muted">DynamoDB</text>
+  <text x="1413" y="356" class="body muted">Evidence + typed proposal</text>
+  <text x="1413" y="388" class="body muted">Owner, plan version + hash</text>
+  <text x="1413" y="418" fill="#23766a" font-size="17" font-weight="700">Preparation creates no event</text>
+
+  <path d="M1562 446 V535" fill="none" stroke="#b27120" stroke-width="3.2" marker-end="url(#amberArrow)"/>
+  <text x="1542" y="483" text-anchor="end" fill="#95611f" font-size="18">User reviews the saved draft</text>
+
+  <text x="64" y="510" class="label muted">02 / EXACT APPROVAL, EXECUTION AND READBACK</text>
+
+  <rect x="1388" y="548" width="348" height="228" rx="20" fill="#fff4df" stroke="#d9ad65" stroke-width="2"/>
+  <text x="1413" y="594" class="heading ink">Android app + user</text>
+  <text x="1413" y="634" class="body muted">Expo / React Native</text>
+  <rect x="1413" y="655" width="294" height="44" rx="12" fill="#153b45"/>
+  <text x="1560" y="683" class="white" font-size="21" font-weight="700" text-anchor="middle">Approve this plan once</text>
+  <text x="1413" y="733" fill="#95611f" font-size="18" font-weight="700">Human approval is required</text>
+  <text x="1413" y="758" fill="#95611f" font-size="17">for every new Calendar action</text>
+
+  <path d="M1380 662 H1342" class="flow"/>
+  <rect x="1026" y="548" width="310" height="228" rx="20" class="card"/>
+  <text x="1051" y="594" class="heading ink">Control API + policy</text>
+  <text x="1051" y="634" class="body muted">Cognito identity</text>
+  <text x="1051" y="667" class="body muted">Exact saved-plan approval</text>
+  <text x="1051" y="700" class="body muted">Scope + version checks</text>
+  <text x="1051" y="743" fill="#23766a" font-size="18" font-weight="700">Models cannot grant authority</text>
+
+  <path d="M1018 662 H980" class="flow"/>
+  <rect x="664" y="548" width="310" height="228" rx="20" class="card"/>
+  <text x="689" y="594" class="heading ink">Approved execution</text>
+  <text x="689" y="634" class="body muted">SQS + durable worker</text>
+  <text x="689" y="667" class="body muted">Recheck + claim the action</text>
+  <text x="689" y="700" class="body muted">Runtime Calendar connector</text>
+  <text x="689" y="743" fill="#23766a" font-size="18" font-weight="700">Idempotency + readback check</text>
+
+  <path d="M656 662 H620" class="flow"/>
+  <rect x="356" y="548" width="258" height="228" rx="20" class="card"/>
+  <text x="381" y="594" class="heading ink">Google Calendar</text>
+  <text x="381" y="634" class="body muted">Create the event</text>
+  <text x="381" y="673" class="body muted">Read the result back</text>
+  <line x1="381" y1="694" x2="589" y2="694" stroke="#d9e2df"/>
+  <text x="381" y="724" class="small muted">API acceptance alone</text>
+  <text x="381" y="750" class="small muted">is not completion</text>
+
+  <path d="M348 662 H310" class="flow"/>
+  <rect x="64" y="548" width="240" height="228" rx="20" fill="#e2eee7" stroke="#b6d4c5" stroke-width="2"/>
+  <text x="89" y="594" class="heading ink">Verified result</text>
+  <text x="89" y="634" class="body muted">Saved in DynamoDB</text>
+  <text x="89" y="673" fill="#23766a" font-size="23" font-weight="700">COMPLETED</text>
+  <text x="89" y="719" class="small muted">Reopen the Case</text>
+  <text x="89" y="747" class="small muted">from mobile history</text>
+
+  <text x="64" y="832" class="label muted">03 / REPEAT PREPARATION, KEEP ATTENTION QUIET</text>
+  <rect x="64" y="855" width="810" height="202" rx="20" fill="#edf1ed" stroke="#d9e2df" stroke-width="2"/>
+  <text x="90" y="900" class="heading ink">PREPARE_ONLY routines</text>
+  <text x="90" y="940" class="body muted">Explicit activation + matching sender domain + new received mail</text>
+  <text x="90" y="972" class="body muted">Current account/profile guards + Candidate CAS → fresh Case</text>
+  <text x="90" y="1016" fill="#23766a" font-size="21" font-weight="700">No inherited event parameters. No recurring write permission.</text>
+  <text x="90" y="1041" class="small muted">Pause stops future triggers; existing Cases remain inspectable.</text>
+
+  <rect x="900" y="855" width="836" height="202" rx="20" fill="#edf1ed" stroke="#d9e2df" stroke-width="2"/>
+  <text x="926" y="900" class="heading ink">Attention notifications</text>
+  <text x="926" y="940" class="body muted">Case attention outbox → worker → Expo Push Service → FCM</text>
+  <text x="926" y="972" class="body muted">Generic Android notification → current authenticated, owned Case</text>
+  <text x="926" y="1016" fill="#23766a" font-size="21" font-weight="700">Ordinary discoveries stay silent. Mail contents stay out of push.</text>
+  <text x="926" y="1041" class="small muted">A notification is an invitation to review, never approval to execute.</text>
+
+  <line x1="64" y1="1090" x2="1736" y2="1090" stroke="#d9e2df" stroke-width="2"/>
+  <text x="64" y="1123" class="ink" font-size="19" font-weight="700">LIVE PROOF</text>
+  <text x="196" y="1123" class="muted" font-size="19">Gmail · one ONCE Calendar event + readback/history · routine activation · Android remote receipt/tap</text>
+  <text x="64" y="1154" class="muted" font-size="18">Natural new-mail routine trigger: not yet observed live; positive flow tested with the actual SDK, Moto and scripted services.</text>
+</svg>

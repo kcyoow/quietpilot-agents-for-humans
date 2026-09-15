@@ -1,0 +1,1125 @@
+openapi: 3.1.0
+info:
+  title: QuietPilot Control API
+  version: 0.1.0
+  x-prd-epics: [1, 2, 3, 4, 5, 6, 7]
+servers:
+  - url: https://api.example.invalid
+security:
+  - cognitoJwt: []
+paths:
+  /v1/connections:
+    get:
+      operationId: listConnections
+      responses:
+        "200":
+          description: Connection summaries
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [connections]
+                properties:
+                  connections:
+                    type: array
+                    items: {$ref: "#/components/schemas/ConnectionSummary"}
+  /v1/connections/google/authorize:
+    post:
+      operationId: authorizeConnection
+      description: Start Google authorization using the server-configured callback. An omitted capability connects Gmail; calendar adds Calendar consent for the same connected account.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                capability: {type: string, enum: [mail, calendar]}
+      responses:
+        "200":
+          description: Current connection and an authorization URL only when browser consent is required
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/GoogleAuthorizationResponse"}
+        "401": {description: Authentication required}
+        "409": {description: Google disconnection or another connection transition is in progress}
+  /v1/connections/google/complete:
+    post:
+      operationId: completeGoogleConnection
+      description: Complete the authenticated owner's browser return using the opaque one-time app return code. Google OAuth tokens and session URIs are not accepted from the app.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: {type: string, pattern: "^[A-Za-z0-9_-]{32,256}$"}
+      responses:
+        "202":
+          description: Google authorization completed and connection setup accepted, or the previously completed connection returned
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/GoogleConnectionResponse"}
+        "400": {description: Invalid return code}
+        "401": {description: Authentication required}
+        "404": {description: Authorization return code not found}
+        "409": {description: Authorization return is expired, belongs to another owner, or conflicts with the current connection}
+  /v1/connections/google:
+    delete:
+      operationId: disconnectGoogleConnection
+      description: Request asynchronous Google revocation. The connection remains REVOKING until the worker confirms completion.
+      responses:
+        "202":
+          description: Current connection after the revocation request
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/GoogleConnectionResponse"}
+        "401": {description: Authentication required}
+  /v1/connections/google/scan:
+    post:
+      operationId: scanConnection
+      description: Request the existing seven-day Google mail scan using saved mail interests.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lookback_days]
+              properties:
+                lookback_days: {type: integer, const: 7}
+      responses:
+        "202":
+          description: Connection scan started or already in progress
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/GoogleConnectionResponse"}
+        "400": {description: The lookback is not seven days, interests are unconfigured, or Google is not ready to scan}
+        "401": {description: Authentication required}
+  /v1/connections/{provider}/inventory:
+    get:
+      operationId: getConnectionInventory
+      parameters:
+        - $ref: "#/components/parameters/Provider"
+      responses:
+        "200":
+          description: API-visible capability boundary
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ConnectionInventory"}
+  /v1/mail/interests:
+    get:
+      operationId: getMailInterests
+      description: Read the authenticated owner's saved interests and current recommendation and scan state.
+      responses:
+        "200":
+          description: Mail interests and asynchronous work state
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MailInterestState"}
+        "401": {description: Authentication required}
+    put:
+      operationId: saveMailInterests
+      description: Save interests using the current profile version. A configured, connected profile starts a new recent-seven-day scan and invalidates previous result generations. Existing Cases are preserved.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/MailProfileInput"}
+      responses:
+        "200":
+          description: Saved interests and current asynchronous work state
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MailInterestState"}
+        "400": {$ref: "#/components/responses/InvalidMailInput"}
+        "401": {description: Authentication required}
+        "409": {$ref: "#/components/responses/MailVersionConflict"}
+  /v1/mail/recommendations:
+    post:
+      operationId: recommendMailInterests
+      description: Request AI tag suggestions from at most 32 recent-seven-day INBOX titles. Only opaque references and decoded Subjects enter the recommendation model. Suggestions are separate from selected interests; duplicate pending requests are coalesced.
+      responses:
+        "202":
+          description: Recommendation request accepted or already pending
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MailInterestState"}
+        "400": {$ref: "#/components/responses/InvalidMailInput"}
+        "401": {description: Authentication required}
+        "409": {$ref: "#/components/responses/MailVersionConflict"}
+  /v1/mail/scan:
+    post:
+      operationId: scanInterestMail
+      description: Request a recent-seven-day interest scan for the authenticated owner's connected Google account. Requires configured interests; duplicate pending requests are coalesced.
+      responses:
+        "202":
+          description: Interest scan accepted or already pending
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MailInterestState"}
+        "400": {$ref: "#/components/responses/InvalidMailInput"}
+        "401": {description: Authentication required}
+        "409": {$ref: "#/components/responses/MailVersionConflict"}
+  /v1/mail/results:
+    get:
+      operationId: listInterestMail
+      description: Read related or HIGH importance mail from the current owner, profile version and scan generation, without requiring an actionable Candidate or Case. Results are ordered globally before pagination.
+      parameters:
+        - name: cursor
+          in: query
+          required: false
+          description: Opaque continuation cursor bound to this owner, profile version, connection and scan generation, and ordered result set. Legacy cursors or result changes require restarting from the first page.
+          schema: {type: string, minLength: 1, maxLength: 4096}
+      responses:
+        "200":
+          description: Current interest-mail results and continuation cursor
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MailResults"}
+        "400": {$ref: "#/components/responses/InvalidMailInput"}
+        "401": {description: Authentication required}
+        "409": {$ref: "#/components/responses/MailVersionConflict"}
+  /v1/suggestion-groups:
+    get:
+      operationId: listSuggestionGroups
+      parameters:
+        - {name: cursor, in: query, schema: {type: string}}
+        - {name: search, in: query, schema: {type: string}}
+      responses:
+        "200":
+          description: Grouped suggestions
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [groups]
+                properties:
+                  groups:
+                    type: array
+                    items: {$ref: "#/components/schemas/CandidateGroupSummary"}
+                  next_cursor: {type: [string, "null"]}
+  /v1/suggestions:
+    get:
+      operationId: listSuggestions
+      parameters:
+        - {name: group_id, in: query, schema: {type: string}}
+        - {name: cursor, in: query, schema: {type: string}}
+      responses:
+        "200":
+          description: Candidate summaries
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [suggestions]
+                properties:
+                  suggestions:
+                    type: array
+                    items: {$ref: "#/components/schemas/CandidateSummary"}
+                  next_cursor: {type: [string, "null"]}
+  /v1/suggestions/{candidate_id}/feedback:
+    post:
+      operationId: submitSuggestionFeedback
+      parameters:
+        - $ref: "#/components/parameters/CandidateId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mode, expected_version]
+              properties:
+                mode:
+                  type: string
+                  enum: [HIDE_ONCE, REDUCE_SIMILAR, ADJUST_SCOPE]
+                expected_version: {type: integer, minimum: 1}
+      responses:
+        "200":
+          description: Feedback applied or policy preview returned
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/SuggestionFeedbackResult"}
+  /v1/suppressions/{rule_id}/undo:
+    post:
+      operationId: undoSuggestionSuppression
+      parameters:
+        - name: rule_id
+          in: path
+          required: true
+          schema: {type: string}
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Suppression removed and matching candidates restored
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [restored_candidate_ids]
+                properties:
+                  restored_candidate_ids:
+                    type: array
+                    items: {type: string}
+  /v1/suggestions/convert:
+    post:
+      operationId: convertSuggestions
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [candidate_ids, expected_versions]
+              properties:
+                candidate_ids:
+                  type: array
+                  minItems: 1
+                  maxItems: 8
+                  items: {type: string}
+                expected_versions:
+                  type: array
+                  minItems: 1
+                  maxItems: 8
+                  items: {type: integer, minimum: 1}
+      responses:
+        "201":
+          description: Case created
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/CaseReference"}
+  /v1/cases:
+    get:
+      operationId: listCases
+      parameters:
+        - name: bucket
+          in: query
+          required: true
+          schema: {type: string, enum: [active, history]}
+        - {name: cursor, in: query, schema: {type: string}}
+      responses:
+        "200":
+          description: Case cards
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [cases]
+                properties:
+                  cases:
+                    type: array
+                    items: {$ref: "#/components/schemas/CaseSummary"}
+                  next_cursor: {type: [string, "null"]}
+    post:
+      operationId: createCase
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/CreateCaseRequest"}
+      responses:
+        "202":
+          description: Case preparation started
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/CaseReference"
+                  - type: object
+                    required: [status]
+                    properties:
+                      status: {const: PREPARING}
+  /v1/cases/{case_id}:
+    get:
+      operationId: getCase
+      parameters:
+        - $ref: "#/components/parameters/CaseId"
+      responses:
+        "200":
+          description: Case details
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/CaseDetail"}
+  /v1/cases/{case_id}/messages:
+    post:
+      operationId: postCaseMessage
+      parameters:
+        - $ref: "#/components/parameters/CaseId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text, expected_version]
+              properties:
+                text: {type: string, minLength: 1, maxLength: 4000}
+                expected_version: {type: integer, minimum: 1}
+      responses:
+        "202":
+          description: Message accepted and the current Case returned for planning
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [message_id, planning_job_id, case]
+                properties:
+                  message_id: {type: string}
+                  planning_job_id: {type: string}
+                  case: {$ref: "#/components/schemas/CaseDetail"}
+  /v1/cases/{case_id}/decision:
+    post:
+      operationId: decideCase
+      parameters:
+        - $ref: "#/components/parameters/CaseId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/DecisionRequest"}
+      responses:
+        "200":
+          description: Decision applied
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/CaseDetail"}
+        "409": {$ref: "#/components/responses/PlanChanged"}
+  /v1/cases/{case_id}/retry:
+    post:
+      operationId: retryCaseActions
+      parameters:
+        - $ref: "#/components/parameters/CaseId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [expected_version]
+              additionalProperties: false
+              properties:
+                expected_version: {type: integer, minimum: 1}
+      responses:
+        "202":
+          description: The same approved operation was requested again
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/CaseDetail"}
+        "409": {$ref: "#/components/responses/PlanChanged"}
+  /v1/cases/{case_id}/stop:
+    post:
+      operationId: stopCase
+      parameters:
+        - $ref: "#/components/parameters/CaseId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [expected_version]
+              properties:
+                expected_version: {type: integer, minimum: 1}
+      responses:
+        "200":
+          description: Case stopped
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/CaseSummary"}
+  /v1/policies:
+    get:
+      operationId: listPolicies
+      responses:
+        "200": {description: Active and revoked policies}
+  /v1/policies/{policy_id}:
+    patch:
+      operationId: updatePolicy
+      parameters:
+        - {name: policy_id, in: path, required: true, schema: {type: string}}
+      responses:
+        "200": {description: Narrowed or paused policy}
+    delete:
+      operationId: revokePolicy
+      parameters:
+        - {name: policy_id, in: path, required: true, schema: {type: string}}
+      responses:
+        "202": {description: Policy revocation accepted}
+  /v1/routines:
+    get:
+      operationId: listRoutines
+      responses:
+        "200":
+          description: Owned routine proposals and current effective state
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/RoutineList"}
+    post:
+      operationId: proposeMailRoutine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/RoutineProposalInput"}
+      responses:
+        "200":
+          description: Inactive prepare-only routine grounded in a verified mail Case
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/RoutineEnvelope"}
+        "409": {description: Source Case or connection must be reviewed}
+  /v1/routines/{routine_id}/activate:
+    post:
+      operationId: activateRoutine
+      parameters:
+        - {name: routine_id, in: path, required: true, schema: {type: string}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/RoutineVersionInput"}
+      responses:
+        "200":
+          description: Exact routine version activated for future preparation only
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/RoutineEnvelope"}
+        "409": {description: Routine or source scope changed}
+  /v1/routines/{routine_id}/pause:
+    post:
+      operationId: pauseRoutine
+      parameters:
+        - {name: routine_id, in: path, required: true, schema: {type: string}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/RoutineVersionInput"}
+      responses:
+        "200":
+          description: Future triggers paused; existing Cases are retained
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/RoutineEnvelope"}
+        "409": {description: Routine version changed}
+  /v1/mobile/push-token:
+    get:
+      operationId: getPushDeviceState
+      parameters:
+        - {name: device_id, in: query, required: true, schema: {type: string, minLength: 8, maxLength: 128}}
+      responses:
+        "200":
+          description: Registration state for the authenticated owner's device, without the token
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/PushDeviceState"}
+    delete:
+      operationId: unregisterPushToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [device_id]
+              properties:
+                device_id: {type: string, minLength: 8, maxLength: 128}
+      responses:
+        "204": {description: Device unregistered for future notifications}
+    put:
+      operationId: putPushToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [expo_push_token, device_id, app_version, platform]
+              properties:
+                expo_push_token: {type: string, minLength: 8, maxLength: 220}
+                device_id: {type: string, minLength: 8, maxLength: 128}
+                app_version: {type: string, minLength: 1, maxLength: 64}
+                platform: {const: android}
+      responses:
+        "204": {description: Token registered}
+  /webhooks/google/pubsub:
+    post:
+      operationId: receiveGooglePubSub
+      security: []
+      responses:
+        "204": {description: Verified event durably queued}
+        "401": {description: Invalid Google OIDC token}
+  /webhooks/smartthings:
+    post:
+      operationId: receiveSmartThingsWebhook
+      security: []
+      responses:
+        "204": {description: Verified event durably queued}
+        "401": {description: Invalid SmartThings signature}
+components:
+  securitySchemes:
+    cognitoJwt:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.example.invalid/oauth2/authorize
+          tokenUrl: https://auth.example.invalid/oauth2/token
+          scopes: {}
+  parameters:
+    Provider:
+      name: provider
+      in: path
+      required: true
+      schema: {type: string, enum: [google, smartthings]}
+    CandidateId:
+      name: candidate_id
+      in: path
+      required: true
+      schema: {type: string}
+    CaseId:
+      name: case_id
+      in: path
+      required: true
+      schema: {type: string}
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        pattern: "^[A-Za-z0-9._:-]{8,128}$"
+  schemas:
+    RoutineProposalInput:
+      type: object
+      additionalProperties: false
+      required: [case_id, expected_version]
+      properties:
+        case_id: {type: string, minLength: 1, maxLength: 128}
+        expected_version: {type: integer, minimum: 1}
+    RoutineVersionInput:
+      type: object
+      additionalProperties: false
+      required: [expected_version]
+      properties:
+        expected_version: {type: integer, minimum: 1}
+    MailRoutine:
+      type: object
+      additionalProperties: false
+      required: [routine_id, version, status, effective_status, source_case_id, title, description, sender_domain, opportunity_type, mode, activated_at, created_at, updated_at, review_reason]
+      properties:
+        routine_id: {type: string, minLength: 1, maxLength: 128}
+        version: {type: integer, minimum: 1}
+        status: {type: string, enum: [PROPOSED, ACTIVE, PAUSED]}
+        effective_status: {type: string, enum: [PROPOSED, ACTIVE, PAUSED, REVIEW_REQUIRED]}
+        source_case_id: {type: string, minLength: 1, maxLength: 128}
+        title: {type: string, minLength: 1}
+        description: {type: string, minLength: 1}
+        sender_domain: {type: string, minLength: 1}
+        opportunity_type: {type: string, enum: [DEADLINE, APPOINTMENT]}
+        mode: {type: string, const: PREPARE_ONLY}
+        activated_at: {type: [string, "null"], format: date-time}
+        created_at: {type: string, format: date-time}
+        updated_at: {type: string, format: date-time}
+        review_reason: {type: [string, "null"]}
+    RoutineEnvelope:
+      type: object
+      additionalProperties: false
+      required: [routine]
+      properties:
+        routine: {$ref: "#/components/schemas/MailRoutine"}
+    RoutineList:
+      type: object
+      additionalProperties: false
+      required: [routines]
+      properties:
+        routines: {type: array, maxItems: 32, items: {$ref: "#/components/schemas/MailRoutine"}}
+    PushDeviceState:
+      type: object
+      additionalProperties: false
+      required: [device_id, registered]
+      properties:
+        device_id: {type: string, minLength: 8, maxLength: 128}
+        registered: {type: boolean}
+        app_version: {type: string}
+        platform: {type: string, const: android}
+        updated_at: {type: string, format: date-time}
+    GoogleConnectionResponse:
+      type: object
+      required: [connection]
+      properties:
+        connection: {$ref: "#/components/schemas/ConnectionSummary"}
+    GoogleAuthorizationResponse:
+      allOf:
+        - $ref: "#/components/schemas/GoogleConnectionResponse"
+        - type: object
+          properties:
+            authorization_url:
+              type: string
+              format: uri
+              description: Present only when the app must open browser consent.
+    MailTag:
+      type: string
+      minLength: 1
+      maxLength: 32
+      pattern: '^[^\s#]+$'
+      description: A canonical tag normalized with Unicode NFKC and trimmed, containing no whitespace or hash characters. Length is measured in Unicode code points; other punctuation and Unicode are preserved.
+    MailStage:
+      type: string
+      enum: [NOT_STARTED, PENDING, READY, ERROR]
+    MailProfile:
+      type: object
+      additionalProperties: false
+      required: [tags, description, version, updated_at]
+      properties:
+        tags:
+          type: array
+          maxItems: 8
+          items: {$ref: "#/components/schemas/MailTag"}
+          description: Alternative interest topics. Natural-language conditions and exclusions refine relevance.
+        description: {type: string, maxLength: 1000}
+        version: {type: integer, minimum: 0}
+        updated_at: {type: [string, "null"], format: date-time}
+      description: Blank tags and description mean unconfigured. Version zero represents the initial unsaved profile.
+    MailProfileInput:
+      type: object
+      additionalProperties: false
+      required: [expected_version, tags, description]
+      properties:
+        expected_version: {type: integer, minimum: 0}
+        tags:
+          type: array
+          maxItems: 8
+          items: {$ref: "#/components/schemas/MailTag"}
+        description: {type: string, maxLength: 1000}
+    RecommendedMailTag:
+      type: object
+      additionalProperties: false
+      required: [tag, evidence_refs]
+      properties:
+        tag: {$ref: "#/components/schemas/MailTag"}
+        evidence_refs:
+          type: array
+          minItems: 1
+          maxItems: 32
+          items: {type: string, minLength: 1, maxLength: 256}
+          description: Opaque references to the sampled titles supporting this suggested topic.
+    MailRecommendations:
+      type: object
+      additionalProperties: false
+      required: [status, request_id, tags, title_count, generated_at, error_code]
+      properties:
+        status: {$ref: "#/components/schemas/MailStage"}
+        request_id: {type: [string, "null"], minLength: 1, maxLength: 256}
+        tags:
+          type: array
+          maxItems: 8
+          items: {$ref: "#/components/schemas/RecommendedMailTag"}
+        title_count:
+          type: integer
+          minimum: 0
+          maximum: 32
+          description: Actual number of decoded Subjects supplied to the recommendation model, within the bounded recent-seven-day sample.
+        generated_at: {type: [string, "null"], format: date-time}
+        error_code: {type: [string, "null"], maxLength: 128}
+    MailScan:
+      type: object
+      additionalProperties: false
+      required: [status, scan_id, profile_version, processed_count, matched_count, completed_at, error_code]
+      properties:
+        status: {$ref: "#/components/schemas/MailStage"}
+        scan_id: {type: [string, "null"], minLength: 1, maxLength: 256}
+        profile_version: {type: integer, minimum: 0}
+        processed_count: {type: integer, minimum: 0}
+        matched_count: {type: integer, minimum: 0}
+        completed_at: {type: [string, "null"], format: date-time}
+        error_code: {type: [string, "null"], maxLength: 128}
+    MailInterestState:
+      type: object
+      additionalProperties: false
+      required: [profile, recommendations, scan]
+      properties:
+        profile: {$ref: "#/components/schemas/MailProfile"}
+        recommendations: {$ref: "#/components/schemas/MailRecommendations"}
+        scan: {$ref: "#/components/schemas/MailScan"}
+    MailResult:
+      type: object
+      additionalProperties: false
+      required: [evidence_ref, title, summary, reason, sender_domain, received_at, matched_tags]
+      properties:
+        evidence_ref: {type: string, minLength: 1, maxLength: 256}
+        title:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: Authoritative normalized mail title, not model-generated text.
+        summary: {type: string, maxLength: 2000}
+        reason: {type: string, maxLength: 2000}
+        sender_domain: {type: string, maxLength: 255}
+        importance:
+          type: string
+          enum: [HIGH, NORMAL, LOW]
+          description: Importance assigned to the mail; absence means NORMAL for legacy results.
+        received_at:
+          type: [string, "null"]
+          format: date-time
+          description: Source receipt timestamp, or null when unavailable.
+        matched_tags:
+          type: array
+          maxItems: 8
+          items: {$ref: "#/components/schemas/MailTag"}
+          description: Saved tags supporting the match; may be empty when the freeform description explains relevance or HIGH importance justifies selection outside the saved topics.
+      description: Mail selected for relevance or importance, with a bounded generated summary and selection reason. Raw snippets and bodies are never returned or persisted in this result.
+    MailResults:
+      type: object
+      additionalProperties: false
+      required: [profile_version, scan_id, status, items, next_cursor]
+      properties:
+        profile_version: {type: integer, minimum: 0}
+        scan_id: {type: [string, "null"], minLength: 1, maxLength: 256}
+        status: {$ref: "#/components/schemas/MailStage"}
+        items:
+          type: array
+          maxItems: 100
+          items: {$ref: "#/components/schemas/MailResult"}
+          description: Globally ordered before pagination by HIGH, NORMAL, LOW importance, then receipt time descending (unknown last), then evidence reference ascending. The complete result set is bounded to 512 records; overflow fails explicitly.
+        next_cursor: {type: [string, "null"], minLength: 1, maxLength: 4096}
+    MailApiError:
+      type: object
+      additionalProperties: false
+      required: [error, request_id]
+      properties:
+        error: {type: string}
+        request_id: {type: string}
+    ConnectionSummary:
+      type: object
+      additionalProperties: false
+      required: [provider, label, status, granted_scopes, lookback_days, scan_progress, discovery_revision, error_code, last_checked_at, last_sync_mode, watch_expires_at, watch_renewed_at, next_renewal_due_at, version]
+      properties:
+        calendar:
+          type: object
+          additionalProperties: false
+          required: [status, granted_scopes]
+          properties:
+            status: {type: string, enum: [CONNECTED, DISCONNECTED]}
+            granted_scopes: {type: array, items: {type: string}}
+        provider: {type: string, enum: [google, smartthings]}
+        label: {type: string}
+        status: {type: string, enum: [DISCONNECTED, CONNECTING, SCANNING, CONNECTED, REVOKING, ERROR]}
+        granted_scopes: {type: array, items: {type: string}}
+        lookback_days: {type: integer, minimum: 1, maximum: 30}
+        scan_progress: {type: integer, minimum: 0, maximum: 100}
+        discovery_revision: {type: integer, minimum: 0}
+        error_code: {type: [string, "null"]}
+        last_checked_at: {type: [string, "null"], format: date-time}
+        last_sync_mode:
+          type: [string, "null"]
+          enum: [INITIAL_7_DAY, INCREMENTAL, BOUNDED_FULL_SYNC, null]
+        watch_expires_at: {type: [string, "null"], format: date-time}
+        watch_renewed_at: {type: [string, "null"], format: date-time}
+        next_renewal_due_at: {type: [string, "null"], format: date-time}
+        version: {type: integer, minimum: 0}
+    ConnectionInventory:
+      type: object
+      additionalProperties: false
+      required: [accessible, unavailable, checked_at, completeness]
+      properties:
+        accessible: {type: array, items: {type: object}}
+        unavailable: {type: array, items: {type: object}}
+        checked_at: {type: string, format: date-time}
+        completeness: {type: string, enum: [COMPLETE, PARTIAL, UNKNOWN]}
+    CandidateSummary:
+      type: object
+      additionalProperties: false
+      required: [candidate_id, provider, source_type, outcome, summary, why_now, opportunity_type, proposed_actions, evidence_refs, confidence, risk, primary_group_id, tags, status, version, created_at, updated_at]
+      properties:
+        candidate_id: {type: string}
+        mail_profile_version:
+          type: integer
+          minimum: 1
+          description: Saved mail-interest version that produced this personalized Candidate, when present.
+        mail_scan_id:
+          type: string
+          pattern: '^[a-f0-9]{32}$'
+          description: Mail scan generation that produced this personalized Candidate, when present.
+        provider: {type: string, enum: [google]}
+        source_type: {type: string, enum: [CONNECTED_SIGNAL]}
+        outcome: {type: string}
+        summary: {type: string}
+        why_now: {type: string}
+        opportunity_type: {type: string, enum: [APPOINTMENT, DEADLINE, FOLLOW_UP]}
+        proposed_actions:
+          type: array
+          minItems: 1
+          maxItems: 3
+          items: {$ref: "#/components/schemas/CandidateAction"}
+        evidence_refs:
+          type: array
+          items: {type: string}
+        confidence: {type: number, minimum: 0, maximum: 1}
+        risk: {$ref: "#/components/schemas/Risk"}
+        primary_group_id: {type: string}
+        tags:
+          type: array
+          items: {type: string}
+        status: {type: string, enum: [DISCOVERED, GROUPED, VISIBLE, SELECTED, CONVERTED, HIDDEN, EXPIRED]}
+        version: {type: integer, minimum: 1}
+        created_at: {type: string, format: date-time}
+        updated_at: {type: string, format: date-time}
+    CandidateAction:
+      type: object
+      additionalProperties: false
+      required: [connector, target_resource, verb, parameters, risk, reversible, required_scopes, verification_method]
+      properties:
+        connector: {type: string, minLength: 1}
+        target_resource: {type: string, minLength: 1}
+        verb: {type: string, minLength: 1}
+        parameters: {type: object}
+        risk: {$ref: "#/components/schemas/Risk"}
+        reversible: {type: boolean}
+        required_scopes: {type: array, items: {type: string}}
+        verification_method: {type: string, minLength: 1}
+    CandidateGroupSummary:
+      type: object
+      additionalProperties: false
+      required: [group_id, label, reason, candidate_count, highest_risk]
+      properties:
+        group_id: {type: string}
+        label: {type: string}
+        reason: {type: string}
+        candidate_count: {type: integer, minimum: 0}
+        highest_risk: {$ref: "#/components/schemas/Risk"}
+    SuggestionFeedbackResult:
+      type: object
+      additionalProperties: false
+      required: [mode, candidate, affected_candidate_ids, rule_id]
+      properties:
+        mode: {type: string, enum: [HIDE_ONCE, REDUCE_SIMILAR, ADJUST_SCOPE]}
+        candidate:
+          oneOf:
+            - {$ref: "#/components/schemas/CandidateSummary"}
+            - {type: "null"}
+        affected_candidate_ids:
+          type: array
+          items: {type: string}
+        rule_id: {type: [string, "null"]}
+        preview: {type: string}
+    CaseReference:
+      type: object
+      additionalProperties: false
+      required: [case_id]
+      properties:
+        case_id: {type: string}
+    CreateCaseRequest:
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required: [prompt]
+          properties:
+            prompt: {type: string, minLength: 1, maxLength: 4000}
+        - type: object
+          additionalProperties: false
+          required: [candidate_ids]
+          properties:
+            candidate_ids:
+              type: array
+              minItems: 1
+              maxItems: 8
+              items: {type: string}
+    CaseSummary:
+      unevaluatedProperties: false
+      allOf:
+        - $ref: "#/components/schemas/CaseSummaryFields"
+    CaseSummaryFields:
+      type: object
+      required: [case_id, case_type, goal, summary, status, risk, priority, version, updated_at, why_now, next_action, providers]
+      properties:
+        case_id: {type: string}
+        case_type: {$ref: "#/components/schemas/CaseType"}
+        goal: {type: string}
+        summary: {type: string}
+        status: {$ref: "#/components/schemas/CaseStatus"}
+        risk: {$ref: "#/components/schemas/Risk"}
+        priority: {type: integer}
+        version: {type: integer, minimum: 1}
+        updated_at: {type: string, format: date-time}
+        why_now: {type: [string, "null"]}
+        next_action: {type: [string, "null"]}
+        providers:
+          type: array
+          items: {type: string, enum: [google, smartthings, sms]}
+    CaseDetail:
+      unevaluatedProperties: false
+      allOf:
+        - $ref: "#/components/schemas/CaseSummaryFields"
+        - type: object
+          required: [evidence, plan, actions, timeline, messages, current_plan_version, current_plan_hash]
+          properties:
+            evidence:
+              type: array
+              items: {$ref: "#/components/schemas/CaseEvidence"}
+            plan:
+              oneOf:
+                - {$ref: "#/components/schemas/CasePlan"}
+                - {type: "null"}
+            actions:
+              type: array
+              items: {$ref: "#/components/schemas/CaseAction"}
+            timeline:
+              type: array
+              items: {$ref: "#/components/schemas/CaseTimelineEvent"}
+            messages:
+              type: array
+              items: {$ref: "#/components/schemas/CaseMessage"}
+            current_plan_version: {type: [integer, "null"]}
+            current_plan_hash: {type: [string, "null"]}
+            requested_plan_version: {type: [integer, "null"], minimum: 1}
+    CaseEvidence:
+      type: object
+      additionalProperties: false
+      required: [evidence_id, evidence_ref, provider, label, detail, revision]
+      properties:
+        evidence_id: {type: string}
+        evidence_ref: {type: string}
+        provider: {type: string, enum: [google, smartthings, sms, direct]}
+        label: {type: string}
+        detail: {type: string}
+        revision: {type: integer, minimum: 1}
+    CaseAction:
+      type: object
+      additionalProperties: false
+      required: [action_id, connector, label, target, verb, parameters, risk, reversible, required_scopes, status, result_summary]
+      properties:
+        action_id: {type: string}
+        connector: {type: string}
+        label: {type: string}
+        target: {type: string}
+        verb: {type: string}
+        parameters: {type: object}
+        risk: {$ref: "#/components/schemas/Risk"}
+        reversible: {type: boolean}
+        required_scopes: {type: array, items: {type: string}}
+        status: {type: string, enum: [PROPOSED, APPROVED, QUEUED, RUNNING, VERIFYING, SUCCEEDED, BLOCKED, CANCELLED, FAILED]}
+        result_summary: {type: [string, "null"]}
+        result_ref: {type: [string, "null"]}
+        html_url: {type: [string, "null"], format: uri}
+        verified: {type: boolean}
+        error_code: {type: [string, "null"]}
+    CasePlan:
+      type: object
+      additionalProperties: false
+      required: [version, hash, reason, expected_outcome, risk, reversibility, required_scopes, available_grant_modes, actions]
+      properties:
+        local_preparation_status:
+          type: string
+          enum: [READY, NO_ACTION, NEEDS_INPUT]
+        evidence_revisions:
+          type: object
+          additionalProperties: {type: integer, minimum: 1}
+        version: {type: integer, minimum: 1}
+        hash: {type: string, pattern: "^[0-9a-f]{64}$"}
+        reason: {type: string}
+        expected_outcome: {type: string}
+        risk: {$ref: "#/components/schemas/Risk"}
+        reversibility: {type: string}
+        required_scopes: {type: array, items: {type: string}}
+        available_grant_modes:
+          type: array
+          items: {$ref: "#/components/schemas/GrantMode"}
+        actions:
+          type: array
+          items: {$ref: "#/components/schemas/CaseAction"}
+    CaseTimelineEvent:
+      type: object
+      additionalProperties: false
+      required: [event_id, label, body, state, occurred_at]
+      properties:
+        event_id: {type: string}
+        label: {type: string}
+        body: {type: string}
+        state: {type: string, enum: [DONE, CURRENT, PENDING, FAILED]}
+        occurred_at: {type: string, format: date-time}
+    CaseMessage:
+      type: object
+      additionalProperties: false
+      required: [message_id, author, text, created_at]
+      properties:
+        message_id: {type: string}
+        author: {type: string, enum: [USER, QUIETPILOT]}
+        text: {type: string}
+        created_at: {type: string, format: date-time}
+    DecisionRequest:
+      type: object
+      additionalProperties: false
+      required: [decision, plan_version, plan_hash, grant_mode, expected_version]
+      properties:
+        decision: {type: string, enum: [APPROVE, REJECT, DEFER, STOP]}
+        plan_version: {type: integer, minimum: 1}
+        plan_hash: {type: string, pattern: "^[0-9a-f]{64}$"}
+        grant_mode: {$ref: "#/components/schemas/GrantMode"}
+        conditions: {type: [object, "null"]}
+        expected_version: {type: integer, minimum: 1}
+    CaseType:
+      type: string
+      enum: [CONNECTED_SIGNAL, DIRECT_DELEGATION, ROUTINE_DISCOVERY, EXCEPTION_APPROVAL]
+    CaseStatus:
+      type: string
+      enum: [PREPARING, DECISION_REQUIRED, APPROVED, QUEUED, RUNNING, VERIFYING, COMPLETED, FAILED, PAUSED, PERMISSION_REVOKED, STOPPED]
+    Risk:
+      type: string
+      enum: [LOW, MEDIUM, HIGH]
+    GrantMode:
+      type: string
+      enum: [ONCE, CONDITIONAL, STANDING]
+    Error:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code: {type: string}
+        message: {type: string}
+    ControlApiError:
+      type: object
+      additionalProperties: false
+      required: [error, request_id]
+      properties:
+        error: {type: string}
+        request_id: {type: string}
+  responses:
+    InvalidMailInput:
+      description: Invalid mail preferences or cursor, missing Google connection, or unconfigured interests for a scan.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/MailApiError"}
+    MailVersionConflict:
+      description: The mail profile, connection or result generation changed. Read the current state before retrying.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/MailApiError"}
+    AcceptedJob:
+      description: Job accepted
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [job_id]
+            properties:
+              job_id: {type: string}
+    PlanChanged:
+      description: Plan or Case version changed. Fetch the current Case before another decision.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/ControlApiError"}

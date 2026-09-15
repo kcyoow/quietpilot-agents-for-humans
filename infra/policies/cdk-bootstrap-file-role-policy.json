@@ -1,0 +1,28 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublishQuietPilotFileAssetsWithoutDeletion",
+      "Effect": "Allow",
+      "Action": [
+        "s3:AbortMultipartUpload",
+        "s3:GetBucketLocation",
+        "s3:GetEncryptionConfiguration",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:ListBucketMultipartUploads",
+        "s3:ListMultipartUploadParts",
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::cdk-hnb659fds-assets-424792720291-ap-northeast-2",
+        "arn:aws:s3:::cdk-hnb659fds-assets-424792720291-ap-northeast-2/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceAccount": "424792720291"
+        }
+      }
+    }
+  ]
+}
