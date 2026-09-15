@@ -1,8 +1,8 @@
 # Testing QuietPilot
 
-Further fresh-account Calendar and remote-push checks were intentionally skipped for this release at the participant's direction; they remain unverified. The completed fresh-account Gmail checks and earlier original-account Calendar/push evidence remain valid. Google testing-user allowlisting still needs to be arranged with the participant; private contact details are not published.
+Further fresh-account Calendar and remote-push checks were intentionally skipped for this release at the participant's direction; they remain unverified. The completed fresh-account Gmail checks and earlier original-account Calendar/push evidence remain valid. Arrange Google testing-user allowlisting through the submission contact; private contact details are not published.
 
-**Standalone preview checked; public download and judge Google access arrangements are pending.** Fresh sign-up/sign-in and Gmail consent/return were verified on a separate account. Fresh-account Calendar and remote-push checks were intentionally skipped and remain unverified.
+**Standalone preview checked and publicly downloadable. Arrange Google access through the submission contact.** Fresh sign-up/sign-in and Gmail consent/return were verified on a separate account. Fresh-account Calendar and remote-push checks were intentionally skipped and remain unverified.
 
 QuietPilot's Android preview connects to hosted AWS services. It includes its JavaScript bundle and does not need an AWS account, developer credentials or a local Metro server. The live Calendar action and remote-push evidence described below came from earlier account checks and is distinct from the fresh-account walkthrough.
 
@@ -17,10 +17,10 @@ QuietPilot's Android preview connects to hosted AWS services. It includes its Ja
 | Supported device | **ARM64 Android API 24+**, target API 36. A fresh Android emulator was checked; physical devices, other ABIs and iOS are not verified. |
 | Embedded JavaScript | **4,477,512 bytes**, included in the APK. The standalone app passed fresh-account checks without Metro. |
 | QuietPilot account | Fresh sign-up/sign-in was verified. The initial list did not show the original account's work. No shared personal login is supplied. |
-| Google account access | Gmail consent and return were verified for the fresh account. **Google OAuth remains in testing mode with two allowlisted users; judges must arrange allowlisting before Google consent.** Fresh-account Calendar consent is pending. |
+| Google account access | Gmail consent and return were verified for the fresh account. **Google OAuth remains in testing mode with two allowlisted users; judges must arrange allowlisting before Google consent.** Further fresh-account Calendar checks were intentionally skipped and remain unverified. |
 | Availability | Final operator confirmation pending. Free judge access must continue through **9 October 2026, 09:00 KST**. |
 
-The final submission must provide a working contact/access route for Google test-user allowlisting; that route is **PENDING**. Do not publish or share the developer's personal credentials. A normal QuietPilot signup does not automatically add a Google account to the OAuth test-user list.
+Use the submission contact to request Google test-user allowlisting before consent. Do not publish or share the developer's personal credentials. A normal QuietPilot signup does not automatically add a Google account to the OAuth test-user list.
 
 Use the APK matching the checksum above. Older development APKs require Metro and are not the standalone judge build. Do not substitute a scenario fixture for a failed LIVE connection.
 

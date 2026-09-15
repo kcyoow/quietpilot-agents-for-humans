@@ -1,19 +1,15 @@
-# QuietPilot submission packet
+# QuietPilot submission materials
 
-English preparation materials for the **Everyday Agents** category of the Agents for Humans Hackathon. A standalone Android preview and fresh-account Gmail path are verified. The 186.02-second English film is reviewed; public links and Google judge allowlisting arrangements remain pending; nothing has been submitted.
-
-Final local video: `artifacts/submission/quietpilot-demo-english.mp4`. It is distributed separately from this source-only packet; the public video URL is still pending approval.
+English materials for Everyday Agents. [Public source](https://github.com/kcyoow/quietpilot-agents-for-humans) and [Android APK](https://github.com/kcyoow/quietpilot-agents-for-humans/releases/download/v0.1.0-hackathon/quietpilot-preview.apk) are available. Arrange Google OAuth test-user access through the submission contact; two accounts are currently allowlisted.
 
 | Material | File |
 | --- | --- |
-| Devpost project story and form fields | [Submission draft](../../devpost-submission.md) |
+| Project story | [Submission copy](../../devpost-submission.md) |
 | Judge access and walkthrough | [Judge testing](judge-testing.md) |
-| Architecture attachment | [PNG](architecture.png), [editable SVG](architecture.svg), [component notes](architecture.md) |
-| Reviewed 186.02-second film and narration/shot reference | [Video script](video-script.md) |
-| 34 English subtitle cues retimed for the final cut | [SRT](video-subtitles.srt) |
-| Dated facts, pending handoff and review | [Preparation status](preparation-status.md) |
-| Developer setup and tests | [README](../../README.md), [runtime verification](../runtime-verification.md) |
+| Architecture | [PNG](architecture.png), [SVG](architecture.svg), [component notes](architecture.md) |
+| Current 70.75-second native interaction demo | [Media notes](video-script.md) |
+| Verification and limits | [Runtime guide](../runtime-verification.md), [release checkpoint](preparation-status.md) |
 
-Video recording/rendering and final screenshots are separate work. Do not publish private mail, account identifiers, credentials, push tokens or unreviewed captures. Existing source text may remain in its original language; English captions should translate its meaning without changing the stored record.
+The current movie is `artifacts/submission/quietpilot-demo-live.mp4`, distributed separately. It replaces the rejected slideshow; old planning subtitles are superseded. [Watch the unlisted demo](https://www.youtube.com/watch?v=soepNZl7xAo). The coordinating workflow handles Devpost status. Additional fresh-account Calendar/push checks were explicitly skipped, not completed. Keep free judge access available through 9 October 2026, 09:00 KST.
 
-Before copying this packet into a form, add the approved new repository/APK/video URLs, the Google allowlisting/contact route, and the pending fresh-account Calendar/push results. The Builder profile is verified; enter its required identifier privately in the official form. Keep free judge access available through **9 October 2026, 09:00 KST**. The source package preserves the Expo notice and the [Space Mono OFL 1.1 notice](../../apps/mobile/assets/fonts/LICENSE-SpaceMono.txt).
+The source retains MIT, Expo and [Space Mono OFL 1.1](../../apps/mobile/assets/fonts/LICENSE-SpaceMono.txt) notices. Private credentials/contact details are not included.

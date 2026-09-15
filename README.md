@@ -1,8 +1,10 @@
 # QuietPilot
 
+[Watch the unlisted 70.75-second native interaction demo](https://www.youtube.com/watch?v=soepNZl7xAo).
+
 [Public source](https://github.com/kcyoow/quietpilot-agents-for-humans) · [Download Android APK](https://github.com/kcyoow/quietpilot-agents-for-humans/releases/download/v0.1.0-hackathon/quietpilot-preview.apk) · [Release notes](https://github.com/kcyoow/quietpilot-agents-for-humans/releases/tag/v0.1.0-hackathon)
 
-Further fresh-account Calendar and remote-push checks were intentionally skipped for this release at the participant's direction; they remain unverified. The completed fresh-account Gmail checks and earlier original-account Calendar/push evidence remain valid. Google testing-user allowlisting still needs to be arranged with the participant; private contact details are not published.
+Further fresh-account Calendar and remote-push checks were intentionally skipped for this release at the participant's direction; they remain unverified. The completed fresh-account Gmail checks and earlier original-account Calendar/push evidence remain valid. Arrange Google testing-user allowlisting through the submission contact; private contact details are not published.
 
 An everyday mail agent that prepares useful next steps, asks before changing your calendar, and verifies the result.
 
@@ -12,7 +14,7 @@ The working Android path uses **Strands Agents SDK**, **Amazon Bedrock AgentCore
 
 [Judge testing instructions](docs/submission/judge-testing.md) · [Architecture](docs/submission/architecture.md) · [English submission draft](devpost-submission.md) · [Runtime evidence](docs/runtime-verification.md)
 
-**The standalone Android preview is built and has passed fresh-account checks.** Version 0.1.0 targets ARM64 Android API 24+ and includes JavaScript; its fresh-emulator checks ran without Metro. Fresh sign-up/sign-in, Gmail consent/return and session persistence after a same-signer replacement were verified. The public source and APK release links are listed above; Devpost submission and video publication are separate. Google OAuth is in testing mode with two allowlisted users; judges must arrange access before connecting Google. See the [judge guide](docs/submission/judge-testing.md) for the APK checksum, access gate and remaining checks.
+**The standalone Android preview is built and has passed fresh-account checks.** Version 0.1.0 targets ARM64 Android API 24+ and includes JavaScript; its fresh-emulator checks ran without Metro. Fresh sign-up/sign-in, Gmail consent/return and session persistence after a same-signer replacement were verified. The public source and APK release links are listed above; Devpost submission and video publication are separate. Google OAuth is in testing mode with two allowlisted users; judges must arrange access through the submission contact before connecting Google. See the [judge guide](docs/submission/judge-testing.md) for the APK checksum, access gate and remaining checks.
 
 ![QuietPilot mail, approval, verification, routine and notification architecture](docs/submission/architecture.png)
 
@@ -29,6 +31,8 @@ Snapshot: **2026-09-15, standalone English preview and fresh-account checks**. H
 - The latest full checks passed **1,919 Python tests in 41.77 seconds and 577 mobile tests in 41 suites in 5.19 seconds**. The earlier SDK alignment passed Expo Doctor 21/21. SDK/Moto integration separately covers new-mail routine preparation, approval waiting and duplicate suppression.
 
 A routine triggered by newly received matching real mail, complete optional-action preparation, mailbox-wide recommendation accuracy, physical-device QA, SmartThings and SMS integration remain outside the completed evidence. This verification added no new external Calendar event.
+
+The latest direct-request Calendar QA failed during preparation after clarification. It did not create a new event. The earlier ONCE-approved event/readback remains separate historical proof.
 
 ## Run locally
 
@@ -78,4 +82,4 @@ Product scope, PRD, technical specification and the original build checklist rem
 
 ## License
 
-A root [MIT license](LICENSE) is included for publication review. The original Expo mobile starter [license notice](apps/mobile/LICENSE) is preserved. Space Mono retains its original metadata and [SIL Open Font License 1.1 notice](apps/mobile/assets/fonts/LICENSE-SpaceMono.txt). Publication will use a new repository with fresh, reviewed source history; the existing private repository stays private.
+A root [MIT license](LICENSE) is included for publication review. The original Expo mobile starter [license notice](apps/mobile/LICENSE) is preserved. Space Mono retains its original metadata and [SIL Open Font License 1.1 notice](apps/mobile/assets/fonts/LICENSE-SpaceMono.txt). Publication uses this new repository with fresh, reviewed source history; the existing private repository stays private.

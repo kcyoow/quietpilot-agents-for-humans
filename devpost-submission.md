@@ -1,8 +1,8 @@
 # QuietPilot
 
-Further fresh-account Calendar and remote-push checks were intentionally skipped for this release at the participant's direction; they remain unverified. The completed fresh-account Gmail checks and earlier original-account Calendar/push evidence remain valid. Google testing-user allowlisting still needs to be arranged with the participant; private contact details are not published.
+Further fresh-account Calendar and remote-push checks were intentionally skipped for this release at the participant's direction; they remain unverified. The completed fresh-account Gmail checks and earlier original-account Calendar/push evidence remain valid. Arrange Google testing-user allowlisting through the submission contact; private contact details are not published.
 
-**Devpost submission draft.** Source and Android release links are provided below. Video publication and judge-access contact details remain pending. Nothing in this file has been sent to Devpost.
+**Devpost submission draft.** Public source and Android release links are provided below. Arrange Google access through the submission contact. The coordinating submission workflow owns the final video URL and Devpost status.
 
 ## One-line Summary
 
@@ -64,7 +64,7 @@ Required attachment: [architecture PNG](docs/submission/architecture.png). Edita
 
 ## Testing Instructions
 
-Follow [judge testing instructions](docs/submission/judge-testing.md). The standalone ARM64 Android preview has embedded JavaScript and does not need Metro or an AWS account. Fresh-account sign-up/sign-in, Gmail consent/return, account separation and same-signer replacement persistence were verified. **The Android release link is below. Google OAuth currently has two allowlisted test users; judges must arrange Google access with the submitter.** Calendar consent and a new push check on the fresh account remain pending.
+Follow [judge testing instructions](docs/submission/judge-testing.md). The standalone ARM64 Android preview has embedded JavaScript and does not need Metro or an AWS account. Fresh-account sign-up/sign-in, Gmail consent/return, account separation and same-signer replacement persistence were verified. **The Android release link is below. Google OAuth currently has two allowlisted test users; judges must arrange Google access through the submission contact.** Further fresh-account Calendar/push checks were intentionally skipped and remain unverified.
 
 Developers can use the [README](README.md) and [runtime setup guide](docs/runtime-verification.md) to install dependencies, configure an existing deployment and run local checks. Those commands do not provision a fresh AWS/Google environment or replace judge access.
 
@@ -74,7 +74,7 @@ Live evidence also includes one earlier ONCE-approved Calendar event with readba
 
 ## Public Demo Link
 
-[Download the Android preview](https://github.com/kcyoow/quietpilot-agents-for-humans/releases/download/v0.1.0-hackathon/quietpilot-preview.apk). **Google allowlisting/contact instructions remain pending.** The standalone APK and hosted fresh-account path have been tested; Google access is restricted to two currently allowlisted test users. A live-demo URL is optional in the form, but usable testing access is required. Free access must remain available through **9 October 2026, 09:00 KST**.
+[Download the Android preview](https://github.com/kcyoow/quietpilot-agents-for-humans/releases/download/v0.1.0-hackathon/quietpilot-preview.apk). **Arrange Google testing-user allowlisting through the submission contact.** The standalone APK and hosted fresh-account path have been tested; Google access is restricted to two currently allowlisted test users. A live-demo URL is optional in the form, but usable testing access is required. Free access must remain available through **9 October 2026, 09:00 KST**.
 
 ## Public Repository Link
 
@@ -82,11 +82,9 @@ Live evidence also includes one earlier ONCE-approved Calendar event with readba
 
 ## Demo Video
 
-**Local film completed and reviewed; public URL pending approval.** The 186.02-second video uses English narration and captions, actual native footage and the architecture diagram. Video/audio decoding and representative frame review passed; the official maximum is five minutes.
+The current demo is a **70.75-second actual native interaction edit**, `artifacts/submission/quietpilot-demo-live.mp4`, distributed separately from the repository. It replaces the rejected slideshow. [Watch the unlisted demo](https://www.youtube.com/watch?v=soepNZl7xAo). The earlier slideshow and its subtitles are not the current demo.
 
-Final local artifact: `artifacts/submission/quietpilot-demo-english.mp4`, distributed separately from the source export. The corrected film passed full decoding and uses genuine English-only historical UI crops, a labeled notification/later-Case edit and the actual English routine screen at the end. No saved record or app code was changed for these shots.
-
-The [English narration and shot list](docs/submission/video-script.md) and [retimed subtitles](docs/submission/video-subtitles.srt) cover the problem, live mail, one previously approved and verified Calendar result, routine authority, notifications and Strands architecture. Historical execution evidence is labeled; the edit does not imply a new event was created during the recording.
+The film must not be interpreted as fresh Calendar creation. The latest direct-request QA failed during preparation after clarification; the earlier one-event approval/readback proof remains historical. See the [current media notes](docs/submission/video-script.md).
 
 ## Screenshot Shot List
 
@@ -100,7 +98,9 @@ Capture the final English UI where available. Source-derived text and earlier sa
 
 ## Submission Readiness Notes
 
-The working product has real external-action evidence, a standalone APK and fresh-account Gmail checks. Remaining items are fresh-account Calendar warning/consent and new push verification, the new repository and APK/video URLs, concrete judge Google access and final form entry. The [preparation status](docs/submission/preparation-status.md) keeps these separate from a completed submission.
+The working product has real external-action evidence, a standalone APK and fresh-account Gmail checks. The public source and APK are available at the links above. Further fresh-account Calendar/push checks were intentionally skipped; judge Google access is arranged through the submission contact. Final video/Devpost publication is handled separately. The [preparation status](docs/submission/preparation-status.md) keeps these separate from a completed submission.
+
+The latest direct-request Calendar QA failed during preparation after clarification. It did not create a new event. The earlier ONCE-approved event/readback remains separate historical proof.
 
 ## Known Limitations
 
@@ -108,7 +108,7 @@ The working product has real external-action evidence, a standalone APK and fres
 - The live Calendar proof covers one private deadline event without invitees or reminders. A 15-minute deadline marker represents a deadline, not the duration of the underlying activity.
 - A real routine is active, and background entry points are configured. The positive new-mail-to-routine-to-approval-waiting path is covered by SDK/Moto tests with scripted services; it has not yet been observed on a naturally arriving matching real email.
 - A scan with no warning is not a mailbox-wide accuracy or relevance score. Truncated sources, ambiguous timing and unsupported actions can still stop preparation.
-- Google OAuth is in testing mode with two allowlisted users. A new judge must arrange access; fresh-account Calendar consent and a new push check are still pending. The latest scan completed with 62 messages, but some optional action suggestions remain incomplete. This is a hosted prototype, not a production-scale multi-tenant launch.
+- Google OAuth is in testing mode with two allowlisted users. A new judge must arrange access; further fresh-account Calendar/push checks were intentionally skipped and remain unverified. The latest scan completed with 62 messages, but some optional action suggestions remain incomplete. This is a hosted prototype, not a production-scale multi-tenant launch.
 
 ## TODO Official Form Fields
 
@@ -120,9 +120,9 @@ The working product has real external-action evidence, a standalone APK and fres
 | Submitter Type | **Individual** — participant confirmed. |
 | Country | **Korea Republic of** — participant confirmed; use the exact form option. |
 | AWS Builder ID | Authenticated Builder profile verified; enter the required value privately in the official form. It is deliberately omitted from public materials. |
-| Public repository | Pending approval and URL for a new repository with fresh source-only history. |
+| Public repository | https://github.com/kcyoow/quietpilot-agents-for-humans — public source-only history. |
 | Architecture file | `docs/submission/architecture.png` after artifact review. |
-| Working video | 186.02-second English film reviewed; public URL pending approval. |
-| Testing access | Standalone APK/fresh-account Gmail path verified; public download and judge Google allowlisting arrangements pending. Maintain free access through the judging cutoff. |
+| Working video | 70.75-second actual native interaction edit; [Unlisted demo](https://www.youtube.com/watch?v=soepNZl7xAo). |
+| Testing access | Public standalone APK available; arrange Google allowlisting through the submission contact. Further fresh-account Calendar/push checks were intentionally skipped. |
 
 No additional personal identifier is included unless the actual form requires it.
